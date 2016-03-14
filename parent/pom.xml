@@ -61,7 +61,6 @@
 					<artifactId>aspectj-maven-plugin</artifactId>
 					<version>1.8</version>
 				</plugin>
-
 			</plugins>
 		</pluginManagement>
 	</build>

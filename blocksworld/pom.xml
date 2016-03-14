@@ -64,10 +64,10 @@
                     </executions>
                     <configuration>
                         <failOnError>true</failOnError>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                        <encoding>utf-8</encoding>
-                        <complianceLevel>1.6</complianceLevel>
+                        <source>${project.build.source}</source>
+                        <target>${project.build.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <complianceLevel>${project.build.target}</complianceLevel>
                         <verbose>true</verbose>
                         <showWeaveInfo>true</showWeaveInfo>
                     </configuration>

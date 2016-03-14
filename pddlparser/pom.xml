@@ -87,6 +87,11 @@
   		<artifactId>dsl</artifactId>
   		<version>${project.parent.version}</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-lang3</artifactId>
+  		<scope>test</scope>
+  	</dependency>
   </dependencies>
   <name>Harmony PDDL Parser</name>
 </project>

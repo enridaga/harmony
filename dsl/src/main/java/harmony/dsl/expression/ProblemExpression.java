@@ -10,6 +10,7 @@ import harmony.core.impl.state.InitialState;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -42,6 +43,14 @@ public class ProblemExpression implements Expression<Problem> {
 		this.goal = goal;
 	}
 
+	public List<FactExpression> getInitialState(){
+		return Collections.unmodifiableList(initialState);
+	}
+	
+	public Expression<Condition> getGoal(){
+		return goal;
+	}
+	
 	@Override
 	public Declarations declaresVariables() {
 		return thingsDecl;

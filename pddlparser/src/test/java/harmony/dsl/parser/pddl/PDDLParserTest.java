@@ -1,19 +1,5 @@
 package harmony.dsl.parser.pddl;
 
-import harmony.core.api.operator.Operator;
-import harmony.core.api.property.Property;
-import harmony.dsl.expression.DomainExpression;
-import harmony.dsl.expression.Expression;
-import harmony.dsl.expression.OperatorExpression;
-import harmony.dsl.expression.ProblemExpression;
-import harmony.dsl.expression.PropertyExpression;
-import harmony.pddlparser.DomainParseException;
-import harmony.pddlparser.PDDLDomainParser;
-import harmony.pddlparser.PDDLParserFactory;
-import harmony.pddlparser.PDDLProblemParser;
-import harmony.pddlparser.ParseException;
-import harmony.pddlparser.ProblemParseException;
-
 import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,6 +10,36 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import harmony.core.api.condition.Condition;
+import harmony.core.api.domain.Domain;
+import harmony.core.api.operator.Action;
+import harmony.core.api.operator.GroundAction;
+import harmony.core.api.operator.Operator;
+import harmony.core.api.plan.Plan;
+import harmony.core.api.problem.Problem;
+import harmony.core.api.property.Property;
+import harmony.core.impl.renderer.RendererImpl;
+import harmony.dsl.expression.DomainExpression;
+import harmony.dsl.expression.Expression;
+import harmony.dsl.expression.FactExpression;
+import harmony.dsl.expression.IncorrectBindingException;
+import harmony.dsl.expression.OperatorExpression;
+import harmony.dsl.expression.ProblemExpression;
+import harmony.dsl.expression.PropertyExpression;
+import harmony.dsl.expression.Scope;
+import harmony.dsl.expression.UnboundVariableException;
+import harmony.pddlparser.DomainParseException;
+import harmony.pddlparser.PDDLDomainParser;
+import harmony.pddlparser.PDDLParserFactory;
+import harmony.pddlparser.PDDLProblemParser;
+import harmony.pddlparser.ProblemParseException;
+import harmony.planner.NoSolutionException;
+import harmony.planner.PlannerInputBuilder;
+import harmony.planner.Searcher;
+import harmony.planner.bestfirst.AstarHeuristic;
+import harmony.planner.bestfirst.BestFirstPlanner;
+import harmony.pddlparser.ParseException;
 
 public class PDDLParserTest {
 
@@ -147,7 +163,7 @@ public class PDDLParserTest {
 
 	@Test
 	public void testBlocksworldProblem1() throws ParseException,
-			DomainParseException, ProblemParseException {
+			DomainParseException, ProblemParseException, UnboundVariableException, IncorrectBindingException {
 		log.info(testName.getMethodName());
 
 
@@ -156,25 +172,56 @@ public class PDDLParserTest {
 
 		Assert.assertTrue(parser != null);
 
-		DomainExpression domain = parser.getDomain();
+		DomainExpression domainExpr = parser.getDomain();
 
 		PDDLProblemParser pparser = PDDLParserFactory
 				.getProblemParser(in(BLOCKSWORLD_PROBLEM1));
 
 		Assert.assertTrue(pparser != null);
-		ProblemExpression problem = pparser.getProblem(domain);
-		Assert.assertTrue(problem.getProblemName().equals(domain.getDomainName()));
+		ProblemExpression problemExpr = pparser.getProblem(domainExpr);
+		Assert.assertTrue(problemExpr.getProblemName().equals(domainExpr.getDomainName()));
+		Domain domain = domainExpr.eval(new Scope());
+		Problem problem = problemExpr.eval(new Scope());
+		Searcher planner = new BestFirstPlanner(new PlannerInputBuilder(domain, problem).build(), new AstarHeuristic());
 
-//		Assert.assertTrue(domain.getRequirements().size() == 1);
-//		Assert.assertTrue(domain.getRequirements().get(0).equals(":strips"));
-//		Assert.assertTrue(domain.hasTypes() == false);
-//		Assert.assertTrue(domain.getProperties().size() == 9);
-//		Assert.assertTrue(domain.getOperators().size() == 6);
+		Assert.assertTrue(domainExpr.getRequirements().size() == 1);
+		Assert.assertTrue(domainExpr.getRequirements().get(0).equals(":strips"));
+		Assert.assertTrue(domainExpr.hasTypes() == true);
+		Assert.assertTrue(domainExpr.getProperties().size() == 5);
+		Assert.assertTrue(domainExpr.getOperators().size() == 4);
 
-//		show(domain);
+		show(domainExpr);
+		show(problemExpr);
+
+		try {
+			Plan plan = planner.search();
+			show(plan);
+		} catch (NoSolutionException e) {
+			log.info("No solution :(");
+		}
+
+	}
+
+	private void show(Plan plan){
+		log.info("Solution:");
+		for(GroundAction a: plan.getActions()){
+			log.info(" > {}", new RendererImpl().append((Action) a).toString());
+		}
+	}
+	private void show(ProblemExpression problem) {
+		log.info("Problem: {}", problem.getProblemName());
+//		for(String d : problem.declaresVariables().getOrderedKeys()){
+//			log.info(" Declares {}: {}", d,  problem.declaresVariables().get(d) );
+//		}
+		for(FactExpression f : problem.getInitialState()){
+			log.info(" - {} {}", f.getProperty().getName(), f.getVariables() );
+		}
+		Expression<Condition> c = problem.getGoal();
+		log.info("Goal: {}", c);
 	}
 	
 	private void show(DomainExpression domain) {
+		log.info("Domain: {}", domain.getDomainName());
 		log.info("Properties:");
 		for (Expression<Property> p : domain.getProperties()) {
 			log.info("{}", ((PropertyExpression) p).getName());
@@ -195,6 +242,5 @@ public class PDDLParserTest {
 				log.info("   {} ({})", key, t.getCanonicalName());
 			}
 		}
-
 	}
 }

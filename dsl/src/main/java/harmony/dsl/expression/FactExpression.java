@@ -12,9 +12,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class FactExpression implements Expression<Fact> {
 
-	private Expression<Property> propertyExpr;
+	private PropertyExpression propertyExpr;
 	private String[] variables;
 
+	/**
+	 * A fact expression uses variables, does not declare them.
+	 */
 	@Override
 	public Declarations declaresVariables() {
 		return Declarations.emptyDeclarations();
@@ -23,9 +26,17 @@ public class FactExpression implements Expression<Fact> {
 	public void setProperty(PropertyExpression propertyExpr) {
 		this.propertyExpr = propertyExpr;
 	}
+	
+	public PropertyExpression getProperty(){
+		return propertyExpr;
+	}
 
 	public void setVariables(String... strings) {
 		this.variables = strings;
+	}
+	
+	public String[] getVariables() {
+		return this.variables;
 	}
 
 	@Override

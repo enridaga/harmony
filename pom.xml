@@ -14,15 +14,15 @@
 	</parent>
 
 	<modules>
-        <module>parent</module>
-        <module>core</module>
-	<module>planner</module>
-	<module>commons</module>
-	<module>dsl</module>
-        <module>pddlparser</module>
-        <module>maven-plugin</module>	
-	<module>blocksworld</module>
-        <module>integration-tests</module>
+		<module>parent</module>
+		<module>core</module>
+		<module>planner</module>
+		<module>commons</module>
+		<module>dsl</module>
+		<module>pddlparser</module>
+		<module>maven-plugin</module>
+		<module>blocksworld</module>
+		<module>integration-tests</module>
 	</modules>
 
 
@@ -77,4 +77,23 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	<url>https://github.com/enridaga/harmony</url>
+	<scm>
+		<url>https://github.com/enridaga/harmony</url>
+		<connection>scm:git:git://github.com/enridaga/harmony.git</connection>
+		<developerConnection>scm:git:git@github.com:enridaga/harmony.git</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<email>enricodaga@gmail.com</email>
+			<name>Enrico Daga</name>
+			<url>https://github.com/enridaga</url>
+			<id>enridaga</id>
+		</developer>
+	</developers>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/enridaga/harmony/issues</url>
+	</issueManagement>
+	<description>Harmony is a Java based Planner and PDDL Parser.</description>
 </project>

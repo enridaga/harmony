@@ -23,6 +23,7 @@
 		<module>maven-plugin</module>
 		<module>blocksworld</module>
 		<module>integration-tests</module>
+		<module>cli</module>
 	</modules>
 
 

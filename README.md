@@ -1,2 +1,2 @@
 # harmony
-Harmony is a Java based planned and PDDL parser.
+Harmony is a Java based planner and PDDL parser.

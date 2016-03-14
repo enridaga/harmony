@@ -1,0 +1,731 @@
+/* PDDL */
+options {
+  IGNORE_CASE= true;
+  STATIC = false;
+}
+
+/* lexical analyzer */
+
+/* declaration of the PDDLParser */
+PARSER_BEGIN(PDDLParserImpl)
+
+package harmony.pddlparser;
+
+import java.util.List;
+import java.util.ArrayList;
+import harmony.dsl.expression.Expression;
+import harmony.dsl.expression.*;
+import harmony.core.api.domain.Domain;
+import harmony.core.api.condition.Condition;
+import harmony.core.api.effect.Effect;
+import harmony.core.api.thing.Thing;
+import harmony.core.impl.thing.Something;
+import harmony.core.api.problem.Problem;
+
+class PDDLParserImpl implements PDDLDomainParser, PDDLProblemParser {
+
+    DomainExpression domainExpr = null;
+
+    ProblemExpression problemExpr = null;
+    
+	public DomainExpression getDomain() throws ParseException, DomainParseException	{
+	  try	  {
+		  domainExpr = new DomainExpression();
+		  Domain();
+		  return domainExpr;
+	  }catch(Exception e)	   {
+	     throw new DomainParseException(e);	   }	}
+
+	public ProblemExpression getProblem(DomainExpression domainExpr) throws ParseException, ProblemParseException	{
+	  this.domainExpr = domainExpr; 
+      try
+      {
+          this.problemExpr = new ProblemExpression();
+          Problem();
+          return problemExpr;
+      }catch(Exception e)
+       {
+         throw new ProblemParseException(e);
+       }	}
+}
+PARSER_END(PDDLParserImpl)
+
+
+/* tokens declarations */
+SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN:
+{
+    < OPEN: "(" >
+|   < CLOSE: ")" >
+|   < DEFINE: "define" >
+|   < DOMAIN: "domain" >
+|   < DOMAIN_LABEL: ":domain" >
+|   < OBJECTS: ":objects" >
+|   < GOAL: ":goal" >
+|   < INIT: ":init" >
+/* |   < METRIC: ":metric" > */
+|   < PROBLEM: "problem" >
+|   < REQUIREMENTS: ":requirements" >
+|   < REQUIREMENT_LABELS: ":typing" | ":strips" | ":negative-preconditions" | ":disjunctive-preconditions" | ":existential-preconditions" | "universal-preconditions" | "quantified-preconditions" | ":conditional-effects" | ":adl" | ":derived-predicates" >
+|   < NON_HANDLED_LABELS: ":fluents" | ":durative-actions" | ":duration-inequalities" | ":timed-initial-literals">
+|   < TYPES: ":types" >
+|   < EITHER: "either" >
+|   < CONSTANTS: ":constants" >
+|   < PREDICATES: ":predicates" >
+/* |   < FUNCTIONS: ":functions" > */
+|   < ACTION: ":action" >
+/* |   < DURATIVE_ACTION: ":durative-action"> */
+|   < PARAMETERS: ":parameters" >
+/* |   < DURATION: ":duration" > */
+/* |   < DUR_VAR: "?duration" > */
+|   < PRECONDITION: ":precondition" >
+|   < CONDITION: ":condition" >
+|   < EFFECT: ":effect" >
+|   < AND: "and" >
+|   < OR: "or" >
+|   < NOT: "not" >
+|   < WHEN: "when" >
+|   < FORALL: "forall" >
+|   < EXISTS: "exists" >
+/* |   < OVER_ALL: "over all" > */
+/* |   < AT_START: "at start" > */
+/* |   < AT_END: "at end" > */
+|   < EQUALS: "=" >
+|   < TYPE_IDENT: "-" > /*
+|   < BINARY_OP:  "+" | "*" | "/" >
+|   < BINARY_COMP: "<" | ">" | "=" | ">=" | "<=" >
+|   < ASSIGN_OP: <ASSIGN> | <SCALE_UP> | <SCALE_DOWN> | <INCREASE> | <DECREASE> >
+|   < ASSIGN: "assign">
+|   < SCALE_UP: "scale-up">
+|   < SCALE_DOWN: "scale-down">
+|   < INCREASE: "increase">
+|   < DECREASE: "decrease">
+|   < OPTIMIZATION: <MINIMIZE>|<MAXIMIZE> >
+|   < MINIMIZE: "minimize">
+|   < MAXIMIZE: "maximize">
+|   < TOTAL_TIME: "total-time"> */
+|   < VAR: "?" <NAME> >
+|   < NUMBER: (["0"-"9"])+ ("." (["0"-"9"])+)? >
+|   < NAME: (["a"-"z", "_", "A"-"Z", "0"-"9", "-"])+ >
+}
+
+SPECIAL_TOKEN: 
+{
+    <SINGLE_LINE_COMMENT: ";;" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
+}
+
+void Domain():{
+  Token domainName;}{
+  <OPEN> <DEFINE> <OPEN> <DOMAIN> domainName=<NAME> <CLOSE>  {
+    domainExpr.setDomainName(domainName.image.toLowerCase());  }
+  Requirements()
+  (LOOKAHEAD(2) Types())?
+  Predicates()
+  Actions()
+  <CLOSE>
+  <EOF>}
+
+void Requirements():
+{
+  Token req;
+}
+{
+     < OPEN > < REQUIREMENTS >
+     (
+        req = < REQUIREMENT_LABELS >
+        {
+            domainExpr.addRequirement(req.image.toLowerCase());
+        }
+     | req = < NON_HANDLED_LABELS >
+        {
+          // FIXME Move semantic up
+          System.err.println(req + " is unsupported");
+        }
+     )* < CLOSE >
+  
+}
+
+void Types():{}{
+    < OPEN > < TYPES >
+    {
+      domainExpr.setTypes(new Types(domainExpr.getDomainName()));    }
+    (
+      TypeDeclaration()    )*
+    < CLOSE >}
+
+void TypeDeclaration():
+{
+}
+{
+    LOOKAHEAD(3) CompoundTypeDeclaration()
+  | SimpleTypeDeclaration()
+}
+
+Token SimpleTypeDeclaration():
+{
+  Token type;
+  Token supertype=null;
+}
+{
+  type=< NAME >
+  (< TYPE_IDENT > supertype=SimpleTypeDeclaration())?
+  {
+    if(supertype == null)
+    {
+      domainExpr.getTypes().addType(type.image.toLowerCase());
+    }else
+    {
+      domainExpr.getTypes().addType(type.image.toLowerCase() , supertype.image.toLowerCase());
+    }
+  }
+  {
+    return type;
+  }
+}
+
+void CompoundTypeDeclaration():
+{
+  Token type = null;
+  Token supertype = null;
+  List<String> types = new ArrayList<String>();
+}
+{
+  type=< NAME >
+  < TYPE_IDENT >
+  < OPEN >
+  < EITHER > 
+  (supertype=< NAME >
+    {
+      domainExpr.getTypes().addType(supertype.image.toLowerCase());      
+      types.add(supertype.image.toLowerCase());    }
+  )+
+  < CLOSE >
+  {    domainExpr.getTypes().addType(type.image.toLowerCase());
+    domainExpr.getTypes().getMap().get(type.image.toLowerCase()).addAll(types);
+  }
+}
+
+void Predicates():
+{
+  PropertyExpression expr = null;
+}
+{
+  < OPEN >
+  < PREDICATES >
+    (
+      expr=Predicate()
+     {
+      domainExpr.addProperty(expr);
+     }    )*
+  < CLOSE >
+}
+
+PropertyExpression Predicate():
+{
+  Token predicateName;
+  PropertyExpression expr;
+  Declarations decl;
+}
+{
+  < OPEN >
+  predicateName=< NAME >
+  {
+    expr = new PropertyExpression();
+    expr.setName(predicateName.image.toLowerCase());    }
+    decl=VarDeclarations()
+  < CLOSE >
+  {
+    expr.setDeclarations(decl);    return expr;
+  }
+}
+
+Declarations VarDeclarations():
+{
+  Declarations decl = new Declarations();
+  Token varName;
+  Token varType = null;
+  List<Token > cacheNames = new ArrayList<Token >();}
+{
+  (
+    varName=< VAR >
+	  (
+	    < TYPE_IDENT >
+	    varType=< NAME >
+	  )?
+	  {
+		if(varType == null)		{
+		  cacheNames.add(varName);		}else		{
+		  try		  {
+		    Class<? extends Thing> type = domainExpr.getTypes().getTypeClass(varType.image.toLowerCase());
+		  
+		    for(Token name : cacheNames)		    {
+		       decl.put(name.image.toLowerCase(), type);		    }
+		    cacheNames.clear();
+		    decl.put(varName.image.toLowerCase(), type);
+		  }catch(ClassNotFoundException e)		  {
+			throw new ParseException("Caused by: " + e.getMessage());	      }		}     }
+  )*
+  {
+    if(!cacheNames.isEmpty())    {
+      Class<? extends Thing> type = Thing.class;
+          for(Token v : cacheNames)      {
+        decl.put(v.image.toLowerCase(), type);      }    }    return decl;  }}
+
+Declarations ConstDeclarations():
+{
+  Declarations decl = new Declarations();
+  Token varName;
+  Token varType = null;
+  List<Token > cacheNames = new ArrayList<Token >();
+}
+{
+  (
+    varName=< NAME >
+      (
+        < TYPE_IDENT >
+        varType=< NAME >
+      )?
+      {
+        if(varType == null)
+        {
+          cacheNames.add(varName);
+        }else
+        {
+          try
+          {
+            Class<? extends Thing> type = domainExpr.getTypes().toMakeNew(varType.image.toLowerCase());
+          
+            for(Token name : cacheNames)
+            {
+               decl.put(name.image.toLowerCase(), type);
+            }
+            cacheNames.clear();
+            decl.put(varName.image.toLowerCase(), type);
+          }catch(ClassNotFoundException e)
+          {
+            throw new ParseException("Caused by: " + e.getMessage());
+          }
+        }
+     }
+  )*
+  {
+    if(!cacheNames.isEmpty())
+    {
+      Class<? extends Thing> type = Something.class;
+          for(Token v : cacheNames)
+      {
+        decl.put(v.image.toLowerCase(), type);
+      }
+    }
+    return decl;
+  }
+}
+
+String[] VarReferences():
+{
+  Token var;
+  List<String > references = new ArrayList<String >();
+}
+{
+  (
+    var=< VAR >
+    {
+      references.add(var.image.toLowerCase());
+    }
+  )*
+  {
+    return references.toArray(new String[references.size()]);
+  }
+}
+
+String[] ConstReferences():
+{
+  Token var;
+  List<String > references = new ArrayList<String >();
+}
+{
+  (
+    var=< NAME >
+    {
+      references.add(var.image.toLowerCase());
+    }
+  )*
+  {
+    return references.toArray(new String[references.size()]);
+  }
+}
+
+String[] References():
+{
+  Token var;
+  List<String > references = new ArrayList<String >();
+}
+{
+  (
+    (var=< NAME > | var=< VAR >)
+    {
+      references.add(var.image.toLowerCase());
+    }
+  )*
+  {
+    return references.toArray(new String[references.size()]);
+  }
+}
+
+void Actions():
+{
+}
+{
+  (    Action()
+  )*
+}
+
+void Action():
+{
+  Token actionName;
+  Declarations decl;
+  Expression<Condition> precondition;
+  Expression<Effect> effect;
+  OperatorExpression expr;
+}
+{
+  < OPEN >
+  < ACTION >
+  actionName=< NAME >
+  decl=ActionParameters()
+  precondition=ActionPrecondition()
+  effect=ActionEffect()
+  < CLOSE >
+  {    expr = new OperatorExpression(actionName.image.toLowerCase(), decl, precondition, effect);
+    domainExpr.addOperator(expr);  }
+}
+
+Declarations ActionParameters():
+{
+  Declarations decl;
+}
+{
+  < PARAMETERS >
+  < OPEN >
+  decl=VarDeclarations()
+  < CLOSE >
+  {    return decl;
+  }
+}
+
+Expression<Condition> ActionPrecondition():
+{
+  Expression<Condition > expr;
+}
+{
+  < PRECONDITION >
+  expr=Condition()
+  {    return expr;  }
+}
+
+Expression<Effect> ActionEffect():
+{
+  Expression<Effect> expr;
+}
+{
+  < EFFECT >
+  expr=Effect()
+  {    return expr;  }
+}
+
+/* Conditions */
+Expression<Condition> Condition():
+{
+  Object expr;
+}
+{ (
+  LOOKAHEAD(2) expr=AndCondition()
+  | LOOKAHEAD(2) expr=OrCondition() |
+  LOOKAHEAD(2) expr=NotCondition() | 
+  LOOKAHEAD(2) expr=WhenCondition() | 
+  LOOKAHEAD(2) expr=ForallCondition() | 
+  LOOKAHEAD(2) expr=ExistsCondition() | expr=AssertCondition()
+ )
+ {   return (Expression<Condition>) expr; }
+}
+
+AndConditionExpression AndCondition():
+{
+  AndConditionExpression and = new AndConditionExpression();
+  Expression<Condition > expr;
+}
+{ 
+  < OPEN >
+  < AND >
+    expr=Condition()    {
+      and.append(expr);    }
+    (
+      expr=Condition()
+	    {
+	      and.append(expr);
+	    }
+    )*
+  < CLOSE >  {    return and;  }
+}
+
+OrConditionExpression OrCondition():
+{
+  OrConditionExpression or = new OrConditionExpression();
+  Expression<Condition > expr;
+}
+{ 
+  < OPEN >
+  < OR >
+   expr=Condition()
+    {
+      or.append(expr);
+    }
+    (
+      expr=Condition()
+        {
+          or.append(expr);
+        }
+    )*
+  < CLOSE >
+  {
+    return or;
+  }
+}
+
+NotConditionExpression NotCondition():
+{
+  Expression<Condition> expr;
+  NotConditionExpression not = new NotConditionExpression();
+}
+{
+  < OPEN >
+  < NOT >
+    expr=Condition()
+  < CLOSE >
+  {
+    not.setCondition(expr);    return not;
+  }
+}
+
+AssertFactConditionExpression AssertCondition():
+{
+  AssertFactConditionExpression expr = new AssertFactConditionExpression();
+  Token property;
+  String[] variables;}
+{
+  < OPEN >
+  property=< NAME >
+  variables=References()
+  < CLOSE >
+  {
+    try{
+	    expr.set(domainExpr.getProperty(property.image.toLowerCase()), variables);
+	  }catch(AssertionExpressionException ex)	  {
+	    throw new ParseException("Parse exception. Cause was: " + ex.getMessage());	  }
+    return expr;  }}
+
+WhenConditionExpression WhenCondition():
+{
+  WhenConditionExpression expr = new WhenConditionExpression();
+  Expression when;
+  Expression then;
+  Expression otherwise = null;}{
+  < OPEN >
+  < WHEN >
+  when=Condition()
+  then=Condition()
+  (    otherwise=Condition()
+  )?
+  < CLOSE >  {
+    expr.setWhen(when);
+    expr.setThen(then);
+    if(otherwise!=null)    {    
+      expr.setOtherwise(otherwise);    }    return expr;  }  }
+
+ForallConditionExpression ForallCondition():
+{
+  ForallConditionExpression expr = new ForallConditionExpression();
+  Declarations vars;
+  Expression condition;}{
+  < OPEN >
+  < FORALL >
+    < OPEN >
+    vars=VarDeclarations()
+    < CLOSE >
+    condition=Condition()
+  < CLOSE >  {
+    expr.set(vars,condition);    return expr;  }}
+
+ExistsConditionExpression ExistsCondition():
+{
+  ExistsConditionExpression expr = new ExistsConditionExpression();
+  Declarations decl;
+  Expression condition;}{
+  < OPEN >
+  < EXISTS >
+	< OPEN >
+	decl=VarDeclarations()
+	< CLOSE >
+  condition=Condition()
+  < CLOSE >
+  {
+    expr.set(decl,condition);
+    return expr;  }}
+
+/* Effects */
+Expression<Effect> Effect():
+{
+  Object expr;
+}
+{
+  (
+  LOOKAHEAD(2) expr=AndEffect() |
+  LOOKAHEAD(2) expr=NotEffect() | 
+  LOOKAHEAD(2) expr=ForallEffect() | 
+  LOOKAHEAD(2) expr=WhenEffect() | expr=AssertEffect()
+  )  {    return (Expression<Effect>) expr;  }  
+}
+
+AndEffectExpression AndEffect():
+{
+  AndEffectExpression and = new AndEffectExpression();
+  Expression expr;
+}
+{
+  < OPEN >
+  < AND >
+  expr=Effect()  {
+    and.append(expr);  }
+  (
+    expr=Effect()
+    {
+      and.append(expr);    }
+  )*
+  < CLOSE >  {
+    return and;  }
+}
+
+NotEffectExpression NotEffect():
+{
+  NotEffectExpression expr = new NotEffectExpression();
+  Expression e;
+}
+{
+  < OPEN >
+  < NOT >
+  e=Effect()
+  < CLOSE >  {
+    expr.setEffect(e);    return expr;  }
+}
+
+AddFactEffectExpression AssertEffect():
+{
+  AddFactEffectExpression expr = new AddFactEffectExpression();
+  Token propertyName;
+  String[] variables;
+}
+{
+  < OPEN >
+  propertyName=< NAME >
+  variables=VarReferences()
+  < CLOSE >  {
+    try    {      expr.set(domainExpr.getProperty(propertyName.image.toLowerCase()), variables);
+    }catch(AssertionExpressionException e)    {
+      throw new ParseException("On assertion: " + propertyName.image.toLowerCase() + ". Caused by: " +  e.getMessage());    }
+    return expr;  }
+}
+
+ForallEffectExpression ForallEffect():
+{
+  ForallEffectExpression expr = new ForallEffectExpression();
+  Declarations decl;
+  Expression eff;
+}
+{  < OPEN >
+  < FORALL >
+  < OPEN >
+  decl=VarDeclarations()
+  < CLOSE >
+  eff=Effect()
+  < CLOSE >  {    expr.set(decl, eff);
+    return expr;
+  }
+}
+
+
+WhenEffectExpression WhenEffect():
+{
+  WhenEffectExpression expr = new WhenEffectExpression();
+  Expression when;
+  Expression then;
+  Expression otherwise = null;
+}
+{
+  < OPEN >
+  < WHEN >
+  when=Condition()
+  then=Effect()
+  (
+    otherwise=Effect()
+  )?
+  < CLOSE >  {
+    expr.setWhen(when);
+    expr.setThen(then);
+    if(otherwise!=null)    {
+      expr.setOtherwise(otherwise);
+      return expr;    }  }
+}
+
+/* Problem */
+void Problem():
+{
+  Token problemName;
+  Token domainName;
+}
+{
+  <OPEN> <DEFINE> <OPEN> <PROBLEM> problemName=<NAME> <CLOSE>
+  < OPEN > <DOMAIN_LABEL > domainName=< NAME > < CLOSE >
+  {
+    if(!domainName.image.toLowerCase().equals(domainExpr.getDomainName()))    {
+      throw new ParseException("Wrong domain name. Was " + domainName.image.toLowerCase() + ", must be " + domainExpr.getDomainName() + ".");    }
+    problemExpr.setProblemName(problemName.image.toLowerCase());
+  }
+  Objects()
+  Init()
+  Goal()
+  <CLOSE>
+  <EOF>
+}
+
+void Objects():{
+  Declarations decl;}{
+  < OPEN > <OBJECTS > decl=ConstDeclarations()
+  < CLOSE >
+  {
+    problemExpr.setObjects(decl);  }}
+
+void Init():{
+  Token propertyName;
+  String[] ref;
+  FactExpression fexpr;}{
+  < OPEN > <INIT > (< OPEN > propertyName=<NAME > ref=ConstReferences() < CLOSE >  {
+    fexpr = new FactExpression();
+    fexpr.setProperty(domainExpr.getProperty(propertyName.image.toLowerCase()));
+    fexpr.setVariables(ref);
+    problemExpr.addToInitialState(fexpr);  })* <CLOSE >}
+
+void Goal():
+{
+  Expression<Condition > condition;
+  }
+{
+   < OPEN > <GOAL > condition=Condition() < CLOSE >   {
+     problemExpr.setGoal(condition);   }
+}

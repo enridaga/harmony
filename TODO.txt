@@ -1,0 +1,24 @@
+Development:
+* [core] Implement toString() methods for Conditions and Effects
+* [core] Implement deterministic hashcode for Conditions and Effects. This needs to build factories for and/or operations
+* [dsl] Move the handling of types as Java types from the dsl project to the core project.
+* [dsl] Expressions: the eval() method should be replaced by the visitor pattern:
+** Advantage: remove the dependency dsl->core, 
+** the dsl project defines the interface of the visitor
+** the planner implementation makes the binding between expressions and internal representation (the visitor will be implemented in the planner side)
+* [all] Move logging to logback
+
+Refactoring:
+* [core] The interface PropertyRegistry and relative code is never used. Shall we remove it?
+* [core] Why the OperatorRegistry interface extends Cloneable? Check if it is really needed. 
+* [core] Check whether it makes sense to harmonize the Registries from a single interface, example Registry<T>
+* [core] Make AND, OR, NOT, When, Exists, Forall interfaces decoupled from Condition and Effect
+
+Modularization & Project management:
+* Create a module with sample domains: blocksworld, rocket, etc (create a project for each domain)
+* Move planning tests to a separate project (integration tests)
+* Separate the API of the planners from the implementations:
+** a planning-core (with api and helpers)
+** a planning-bestfirst
+** a planning-graphplan
+* Check dependency declarations and scope for junit and slf4j

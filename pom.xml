@@ -9,7 +9,7 @@
 		<groupId>harmony</groupId>
 		<artifactId>parent</artifactId>
 		<relativePath>parent</relativePath>
-		<version>0.0.1</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<modules>

@@ -3,8 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>harmony</groupId>
-		<artifactId>harmony</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>parent</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../parent</relativePath>
 	</parent>
 	<artifactId>cli</artifactId>
 
@@ -17,27 +18,27 @@
 		<dependency>
 			<groupId>harmony</groupId>
 			<artifactId>planner</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>harmony</groupId>
 			<artifactId>core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>harmony</groupId>
 			<artifactId>dsl</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>harmony</groupId>
 			<artifactId>commons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>harmony</groupId>
 			<artifactId>pddlparser</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

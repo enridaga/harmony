@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Harmony Maven Plugin</name>
+      <prefix>harmony</prefix>
+      <artifactId>harmony-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+version="0.0.2-SNAPSHOT"
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -8,5 +8,5 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-java -jar $DIR/cli/target/harmony-cli-0.0.1-SNAPSHOT.jar "$@"
+java -jar "$DIR/cli/target/harmony-cli-$version.jar" "$@"
 

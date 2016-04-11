@@ -4,9 +4,9 @@ import harmony.core.api.fact.Fact;
 import harmony.core.api.renderer.Renderer;
 import harmony.core.api.thing.Thing;
 import harmony.core.impl.renderer.RendererImpl;
+import harmony.planner.bestfirst.BacktracePlan;
 import harmony.planner.bestfirst.BestFirstSearchReport;
 import harmony.planner.bestfirst.Node;
-import harmony.planner.bestfirst.BestFirstPlanner.BacktracePlan;
 import harmony.tools.serializers.Serializer;
 
 import java.io.IOException;

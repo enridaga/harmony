@@ -1,19 +1,17 @@
 package harmony.planner.bestfirst;
 
-import harmony.core.api.operator.GroundAction;
-import harmony.core.api.plan.Plan;
-import harmony.planner.ActionsProvider;
-import harmony.planner.NoSolutionException;
-import harmony.planner.PlannerInput;
-import harmony.planner.SearchReport;
-import harmony.planner.SimpleActionsProvider;
-import harmony.planner.bestfirst.heuristic.BestNodeHeuristic;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import harmony.core.api.plan.Plan;
+import harmony.planner.ActionsProvider;
+import harmony.planner.NoSolutionException;
+import harmony.planner.PlannerInput;
+import harmony.planner.SimpleActionsProvider;
+import harmony.planner.bestfirst.heuristic.BestNodeHeuristic;
 
 /**
  * Best First Forward searcher.
@@ -117,39 +115,8 @@ public final class BestFirstPlanner implements BestFirstSearcher {
 		return open;
 	}
 	
-	public class BacktracePlan implements Plan {
-		private List<Node> path = null;
-
-		public BacktracePlan(Node node) {
-			path = new ArrayList<Node>();
-			while (!node.isRoot()) {
-				path.add(node);
-				node = (Node) node.getParent();
-			}
-			path.add(node);
-			Collections.reverse(path);
-		}
-
-		public int size() {
-			return path.size() - 1;
-		}
-
-		public List<GroundAction> getActions() {
-			List<GroundAction> steps = new ArrayList<GroundAction>();
-			for (Node n : path) {
-				if (!n.isRoot())
-					steps.add(n.getAction());
-			}
-			return steps;
-		}
-
-		public List<Node> getPath() {
-			return Collections.unmodifiableList(path);
-		}
-	}
-
 	@Override
-	public SearchReport getLastSearchReport() {
+	public BestFirstSearchReport getLastSearchReport() {
 		final Set<Node> fopen = Collections.unmodifiableSet(open);
 		final Set<Node> fclosed = Collections.unmodifiableSet(new HashSet<Node>(closed));
 		final Node froot = root;

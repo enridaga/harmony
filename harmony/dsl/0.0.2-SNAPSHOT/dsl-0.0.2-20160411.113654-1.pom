@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>harmony</groupId>
+		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../parent</relativePath>
+		<artifactId>parent</artifactId>
+	</parent>
+	<artifactId>dsl</artifactId>
+	<name>Harmony DSL</name>
+	<dependencies>
+        <dependency>
+            <groupId>harmony</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>harmony</groupId>
+			<artifactId>planner</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+</project>

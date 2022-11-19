@@ -4,8 +4,8 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>harmony</groupId>
-		<version>0.0.1</version>
-		<relativePath>../parent</relativePath>
+		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../../parent</relativePath>
 	</parent>
 	<artifactId>lod</artifactId>
 	<name>Harmony LOD</name>
@@ -66,10 +66,10 @@
                     </executions>
                     <configuration>
                         <failOnError>true</failOnError>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>${project.build.source}</source>
+                        <target>${project.build.source}</target>
                         <encoding>utf-8</encoding>
-                        <complianceLevel>1.6</complianceLevel>
+                        <complianceLevel>1.8</complianceLevel>
                         <verbose>true</verbose>
                         <showWeaveInfo>true</showWeaveInfo>
                     </configuration>

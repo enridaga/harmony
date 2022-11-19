@@ -4,9 +4,9 @@ import harmony.rdf.writer.RDFWriterTraverseerDelegate;
 import harmony.rdf.writer.mapping.Mapper;
 import harmony.tools.traverse.GenericTraverseerTaskMaster;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
 
 public class JenaModelFeeder extends GenericTraverseerTaskMaster {
 

@@ -23,6 +23,10 @@
 		<module>blocksworld</module>
 		<module>integration-tests</module>
 		<module>cli</module>
+		<!-- experimental, unfinished -->
+		<module>experimental/rdf</module>
+		<module>experimental/lod</module>
+		<module>experimental/lod-use-cases</module>
 	</modules>
 
 

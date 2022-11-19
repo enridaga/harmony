@@ -26,10 +26,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFErrorHandler;
-import com.hp.hpl.jena.rdf.model.RDFWriter;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFErrorHandler;
+//import org.apache.jena.rdf.model.RDFWriter;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.Lang;
 
 public class JenaModelFeederTest {
 
@@ -99,28 +101,31 @@ public class JenaModelFeederTest {
 	}
 
 	private void writeFile(String fileName) throws Exception {
-		RDFWriter w = feeder.getModel().getWriter();
-		w.setErrorHandler(new RDFErrorHandler() {
-
-			@Override
-			public void warning(Exception e) {
-				log.warn("writeFile() ", e);
-			}
-
-			@Override
-			public void fatalError(Exception e) {
-				log.error("writeFile() ", e);
-			}
-
-			@Override
-			public void error(Exception e) {
-				log.error("writeFile() ", e);
-			}
-		});
+//		RDFDataMgr.write();
+//		RDFWriter w = feeder.getModel().getWriter();
+////		RDFDataMgr.;
+//		w.setErrorHandler(new RDFErrorHandler() {
+//
+//			@Override
+//			public void warning(Exception e) {
+//				log.warn("writeFile() ", e);
+//			}
+//
+//			@Override
+//			public void fatalError(Exception e) {
+//				log.error("writeFile() ", e);
+//			}
+//
+//			@Override
+//			public void error(Exception e) {
+//				log.error("writeFile() ", e);
+//			}
+//		});
 		File f = file(fileName);
 		f.delete();
 		f.getParentFile().mkdirs();
-		w.write(feeder.getModel(), new FileOutputStream(f), null);
+		RDFDataMgr.write(new FileOutputStream(f), feeder.getModel(), Lang.RDFXML) ;
+//		w.write(feeder.getModel(), new FileOutputStream(f), null);
 		log.info(" written to {}", f.getAbsolutePath());
 	}
 
@@ -131,14 +136,14 @@ public class JenaModelFeederTest {
 		return res;
 	}
 
-	private com.hp.hpl.jena.rdf.model.Model readFile(String fileName)
+	private org.apache.jena.rdf.model.Model readFile(String fileName)
 			throws URISyntaxException, IOException {
 		File f = file(fileName);
 		log.info(" reading {}", f.getAbsolutePath());
 		return ModelFactory.createDefaultModel().read(f.toURI().toString());
 	}
 
-	private void report(com.hp.hpl.jena.rdf.model.Model model) {
+	private void report(org.apache.jena.rdf.model.Model model) {
 		log.info(" {} statements loaded:", model.size());
 		StmtIterator i = feeder.getModel().listStatements();
 		while (i.hasNext()) {

@@ -3,8 +3,8 @@
   <parent>
     <groupId>harmony</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.1</version>
-    <relativePath>../parent</relativePath>
+    <version>0.0.2-SNAPSHOT</version>
+    <relativePath>../../parent</relativePath>
   </parent>
   <artifactId>rdf</artifactId>
   <packaging>pom</packaging>

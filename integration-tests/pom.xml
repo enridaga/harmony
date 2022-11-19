@@ -11,11 +11,11 @@
 	<name>Harmony Integration Tests</name>
 
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.source>1.7</project.build.source>
-		<project.build.target>1.7</project.build.target>
-	</properties>
+<!--	<properties>-->
+<!--		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+<!--		<project.build.source>${project.build.source}</project.build.source>-->
+<!--		<project.build.target>${project.build.target}</project.build.target>-->
+<!--	</properties>-->
 
 
 	<dependencies>

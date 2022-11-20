@@ -69,7 +69,7 @@
                         <source>${project.build.source}</source>
                         <target>${project.build.source}</target>
                         <encoding>utf-8</encoding>
-                        <complianceLevel>1.8</complianceLevel>
+                        <complianceLevel>11</complianceLevel>
                         <verbose>true</verbose>
                         <showWeaveInfo>true</showWeaveInfo>
                     </configuration>

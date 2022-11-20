@@ -18,6 +18,8 @@ import harmony.planner.Searcher;
 import harmony.planner.bestfirst.BestFirstPlanner;
 import harmony.planner.bestfirst.BestFirstSearchReport;
 import harmony.planner.graphplan.Graphplan;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
@@ -28,17 +30,29 @@ import java.io.InputStream;
 public abstract class AbstractPddlIT {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
+    @Before
+    public void before() {
+    }
+
+    @After
+    public void after() {
+        log.info("{} completed.", testName.getMethodName());
+    }
+
     @Rule
     public TestName testName = new TestName();
 
     protected void runTest(int plannerId, String domainPath, String problemPath)
             throws Exception {
+        System.out.println(domainPath);
+        System.out.println(problemPath);
         log.info("{} is running...", testName.getMethodName());
         InputStream dstream = getClass().getClassLoader().getResourceAsStream(
                 domainPath);
         InputStream pstream = getClass().getClassLoader().getResourceAsStream(
                 problemPath);
-
+        System.out.println(dstream);
+        System.out.println(pstream);
         PDDLDomainParser dparser = PDDLParserFactory.getDomainParser(dstream);
         PDDLProblemParser pparser = PDDLParserFactory.getProblemParser(pstream);
 

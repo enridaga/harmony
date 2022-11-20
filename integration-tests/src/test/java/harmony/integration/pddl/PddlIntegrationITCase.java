@@ -33,14 +33,6 @@ public class PddlIntegrationITCase extends AbstractPddlIT {
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
-	@Before
-	public void before() {
-	}
-
-	@After
-	public void after() {
-		log.info("{} completed.", testName.getMethodName());
-	}
 
 	@Test
 	public void testBF_Blocks_10_0() throws Exception {

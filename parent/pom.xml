@@ -154,7 +154,7 @@
 		<connection>scm:git:git://github.com/enridaga/harmony.git</connection>
 		<developerConnection>scm:git:git@github.com:enridaga/harmony.git</developerConnection>
 	</scm>
-
+	<description>Harmony is a Java based Planner and PDDL Parser.</description>
 	<developers>
 		<developer>
 			<email>enricodaga@gmail.com</email>
@@ -163,4 +163,8 @@
 			<id>enridaga</id>
 		</developer>
 	</developers>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/enridaga/harmony/issues</url>
+	</issueManagement>
 </project>
